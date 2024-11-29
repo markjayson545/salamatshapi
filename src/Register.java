@@ -2,15 +2,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
-public class Login {
-
-    public void showLogin() {
-        JFrame frame = new JFrame("Login");
+public class Register {
+    public void showRegister() {
+        JFrame frame = new JFrame("Register");
         frame.setSize(500, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
-        JLabel label = new JLabel("Login");
+        JLabel label = new JLabel("Register");
 
         JButton backButton = new JButton("Back");
         backButton.addActionListener(new ActionListener() {
@@ -30,7 +29,11 @@ public class Login {
         JPasswordField passwordField = new JPasswordField(20);
         passwordField.setPreferredSize(new Dimension(200, 30));
 
-        JButton button = new JButton("Login");
+        JLabel confirmPasswordLabel = new JLabel("Confirm Password");
+        JPasswordField confirmPasswordField = new JPasswordField(20);
+        confirmPasswordField.setPreferredSize(new Dimension(200, 30));
+
+        JButton button = new JButton("Register");
 
         frame.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -41,6 +44,7 @@ public class Login {
         gbc.anchor = GridBagConstraints.WEST;
         frame.add(backButton, gbc);
         gbc.gridy = 1;
+        
         gbc.anchor = GridBagConstraints.CENTER;
         frame.add(label, gbc);
         gbc.gridy = 2;
@@ -58,6 +62,12 @@ public class Login {
 
         frame.add(passwordField, gbc);
         gbc.gridy = 6;
+
+        frame.add(confirmPasswordLabel, gbc);
+        gbc.gridy = 7;
+
+        frame.add(confirmPasswordField, gbc);
+        gbc.gridy = 8;
 
         // Align to the center
         gbc.anchor = GridBagConstraints.CENTER;
