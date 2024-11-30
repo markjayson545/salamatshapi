@@ -2,6 +2,8 @@ package MainActivity;
 
 import javax.swing.*;
 
+import Theme.Components;
+import Theme.DevSettings;
 import UserAuth.Login;
 import UserAuth.Register;
 import java.awt.*;
@@ -16,11 +18,34 @@ public class Main {
         String headerColor = themeColors.getColor("header");
         String subHeaderColor = themeColors.getColor("subHeader");
         String textColor = themeColors.getColor("text");
-        JFrame frame = new JFrame("Home");
-        frame.setSize(500, 500);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setVisible(true);
 
+        DevSettings devSettings = new DevSettings();
+
+        Components components = new Components();
+
+        
+
+        JFrame frame = new JFrame("Home");
+
+        // JButton tempButton = components.createButton("Login");
+        // tempButton.addActionListener(new ActionListener() {
+        //     @Override
+        //     public void actionPerformed(ActionEvent e) {
+        //         System.out.println("Login button clicked");
+        //     }
+        // });
+        // frame.add(tempButton);
+
+        frame.setSize(
+                devSettings.getDimension("width"),
+                devSettings.getDimension("height"));
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        if (devSettings.getSetting("centered")) {
+            frame.setLocationRelativeTo(null);
+        }
+        frame.setResizable(devSettings.getSetting("resizable"));
+        frame.setAlwaysOnTop(devSettings.getSetting("alwaysOnTop"));
+        frame.setVisible(devSettings.getSetting("visible"));
         frame.getContentPane().setBackground(Color.decode(primaryColor));
 
         frame.setLayout(new GridBagLayout());
@@ -30,7 +55,7 @@ public class Main {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
 
-        JLabel title = new JLabel("Welcome to Shapi");
+        JLabel title = new JLabel("Welcome to " + devSettings.getAppName());
         title.setForeground(Color.decode(headerColor));
         title.setFont(new Font("Arial", Font.BOLD, 30));
 
@@ -51,39 +76,30 @@ public class Main {
         buttonPanel.setBackground(Color.decode(primaryColor));
         buttonPanel.setLayout(new FlowLayout());
 
-        JButton loginButton = new JButton("Login");
-        loginButton.setBackground(Color.decode(secondaryColor));
-        loginButton.setForeground(Color.decode(textColor));
+        JButton loginButton = components.createButton("Login");
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                Login login = new Login();
+                login.showLogin();
+            }
+        });
         buttonPanel.add(loginButton);
 
-        JButton registerButton = new JButton("Register");
-        registerButton.setBackground(Color.decode(secondaryColor));
-        registerButton.setForeground(Color.decode(textColor));
+        JButton registerButton = components.createButton("Register");
+        registerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                Register register = new Register();
+                register.showRegister();
+            }
+        });
         buttonPanel.add(registerButton);
 
         gbc.gridy = 2;
         frame.add(buttonPanel, gbc);
-
-        // onClick event for login button
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            frame.dispose();
-            Login login = new Login();
-            login.showLogin();
-            }
-        });
-
-        // onClick event for register button
-        registerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            frame.dispose();
-            Register register = new Register();
-            register.showRegister();
-            }
-        });
-
     }
 
     public static void main(String[] args) throws Exception {

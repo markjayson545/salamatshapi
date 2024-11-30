@@ -1,8 +1,11 @@
 package UserAuth;
 
 import javax.swing.*;
+import javax.swing.event.*;
 
 import MainActivity.Main;
+import Theme.Components;
+import Theme.DevSettings;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -18,7 +21,10 @@ public class Register {
             return false;
         }
         UserCredentials userCredentials = new UserCredentials();
-        userCredentials.registerUser(username, password);
+        boolean registerStatus = userCredentials.registerUser(username, password);
+        if (!registerStatus) {
+            return false;
+        }
         return true;
     }
 
@@ -30,17 +36,27 @@ public class Register {
         String secondaryColor = themeColors.getColor("secondary");
         String textColor = themeColors.getColor("text");
 
-        frame.setSize(500, 500);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        DevSettings devSettings = new DevSettings();
+        Components components = new Components();
+
+        frame.setSize(
+                devSettings.getDimension("width"),
+                devSettings.getDimension("height"));
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        if (devSettings.getSetting("centered")) {
+            frame.setLocationRelativeTo(null);
+        }
+        frame.setResizable(devSettings.getSetting("resizable"));
+        frame.setAlwaysOnTop(devSettings.getSetting("alwaysOnTop"));
+        frame.setVisible(devSettings.getSetting("visible"));
         frame.getContentPane().setBackground(Color.decode(primaryColor));
 
         // Declare components
         JLabel label = new JLabel("Register");
+        label.setForeground(Color.decode(themeColors.getColor("header")));
+        label.setFont(new Font("Arial", Font.BOLD, 30));
 
-        JButton backButton = new JButton("Back");
-        backButton.setBackground(Color.decode(secondaryColor));
-        backButton.setForeground(Color.decode(textColor));
+        JButton backButton = components.createButton("Back");
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -51,35 +67,65 @@ public class Register {
         });
 
         JLabel userNameLabel = new JLabel("Username");
+        userNameLabel.setForeground(Color.decode(textColor));
         JTextField userName = new JTextField(20);
         userName.setPreferredSize(new Dimension(200, 30));
 
         JLabel passwordLabel = new JLabel("Password");
+        passwordLabel.setForeground(Color.decode(textColor));
         JPasswordField passwordField = new JPasswordField(20);
 
         passwordField.setPreferredSize(new Dimension(200, 30));
 
         JLabel confirmPasswordLabel = new JLabel("Confirm Password");
+        confirmPasswordLabel.setForeground(Color.decode(textColor));
         JPasswordField confirmPasswordField = new JPasswordField(20);
         confirmPasswordField.setPreferredSize(new Dimension(200, 30));
 
-        JButton button = new JButton("Register");
-        button.setBackground(Color.decode(secondaryColor));
-        button.setForeground(Color.decode(textColor));
-        button.addActionListener(new ActionListener() {
+        JButton registerButton = components.createButton("Register");
+
+        // Check if the fields are filled
+        // Disable the button if the fields are empty
+        registerButton.setEnabled(false);
+        DocumentListener documentListener = new DocumentListener() {
+            public void check() {
+                registerButton.setEnabled(userName.getText().length() > 0 && passwordField.getPassword().length > 0 &&
+                        confirmPasswordField.getPassword().length > 0);
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                check();
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                check();
+            }
+
+            public void insertUpdate(DocumentEvent e) {
+                check();
+            }
+        };
+
+        userName.getDocument().addDocumentListener(documentListener);
+        passwordField.getDocument().addDocumentListener(documentListener);
+        confirmPasswordField.getDocument().addDocumentListener(documentListener);
+
+        registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 String usernameInput = userName.getText();
                 String passwordInput = new String(passwordField.getPassword());
                 String confirmPasswordInput = new String(confirmPasswordField.getPassword());
+                RegistrationMessages registrationMessages = new RegistrationMessages();
                 if (validateRegister(usernameInput, passwordInput, confirmPasswordInput)) {
-                    JOptionPane.showMessageDialog(frame, "Registration successful");
+                    registrationMessages.showRegistrationSuccessful();
+                } else if (!passwordInput.equals(confirmPasswordInput)) {
+                    registrationMessages.showPasswordDoNotMatch();
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Registration failed");
+                    registrationMessages.showUsernameAlreadyExists(usernameInput);
                 }
             }
         });
-
         // Build the layout
         frame.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -118,6 +164,6 @@ public class Register {
         gbc.insets = new Insets(10, 0, 10, 0);
         // Align to the center
         gbc.anchor = GridBagConstraints.CENTER;
-        frame.add(button, gbc);
+        frame.add(registerButton, gbc);
     }
 }
