@@ -22,9 +22,10 @@ public class Checkout {
     DevSettings devSettings = new DevSettings();
 
     private double totalPrice = userFileHandler.getTotalPrice(username);
+    private double shippingPrice = 60.00;
     JLabel totalLabel = new JLabel("Total: ₱" + userFileHandler.getTotalPrice(username));
     private void updateTotalPrice() {
-        totalPrice = userFileHandler.getTotalPrice(username);
+        totalPrice = userFileHandler.getTotalPrice(username) + shippingPrice;
         totalLabel.setText("Total: ₱" + totalPrice);
     }
 
@@ -141,15 +142,43 @@ public class Checkout {
         frame.add(checkoutItemsContainer, gbc);
 
         gbc.gridy = 3;
-
-        // Footer Here
+        
+        // Shipping Cost
         JPanel footerPanel = new JPanel();
         footerPanel.setBackground(Color.decode(themeColors.getColor("primary")));
-        footerPanel.setPreferredSize(new Dimension(550, 36));
-        footerPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        footerPanel.setPreferredSize(new Dimension(550, 85)); // Adjusted height
+        footerPanel.setLayout(new BoxLayout(footerPanel, BoxLayout.Y_AXIS));
+
+        JPanel shippingCostPanel = new JPanel();
+        shippingCostPanel.setBackground(Color.decode(themeColors.getColor("primary")));
+        shippingCostPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+        JLabel shippingCostLabel = new JLabel("Shipping Cost: ₱" + shippingPrice);
+        shippingCostLabel.setForeground(Color.decode(themeColors.getColor("text")));
+        shippingCostPanel.add(shippingCostLabel);
+
+        // Total
+        JPanel totalPanel = new JPanel();
+        totalPanel.setBackground(Color.decode(themeColors.getColor("primary")));
+        totalPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
         totalLabel.setForeground(Color.decode(themeColors.getColor("text")));
-        footerPanel.add(totalLabel);
+        totalPanel.add(totalLabel);
+
+        footerPanel.add(shippingCostPanel);
+        footerPanel.add(totalPanel);
+
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.LINE_END; // Align footer to the right
+
+        frame.add(footerPanel, gbc);
+
+        // Reset anchor if needed
+
+        // Checkout Button aligned to the right
+        JPanel checkoutButtonPanel = new JPanel();
+        checkoutButtonPanel.setBackground(Color.decode(themeColors.getColor("primary")));
+        checkoutButtonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
         JButton checkoutButton = new JButton("Checkout");
         checkoutButton.setBackground(Color.decode(themeColors.getColor("secondary")));
@@ -160,9 +189,9 @@ public class Checkout {
                 // Checkout
             }
         });
-        footerPanel.add(checkoutButton);
+        checkoutButtonPanel.add(checkoutButton);
 
-        frame.add(footerPanel, gbc);
+        footerPanel.add(checkoutButtonPanel);
 
 
     }

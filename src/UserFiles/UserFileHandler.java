@@ -107,7 +107,6 @@ public class UserFileHandler {
             String line;
             List<String[]> items = new ArrayList<>();
             String[] currentItem = new String[4]; // Changed to 4 to include amount
-            int index = 0;
 
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("ItemName: ")) {

@@ -122,6 +122,7 @@ public class Homepage {
             public void actionPerformed(ActionEvent e) {
                 UserFileHandler userFileHandler = new UserFileHandler();
                 userFileHandler.addItemToCart(username, productName, description, quantity[0], price);
+                JOptionPane.showMessageDialog(null, "Added to cart");
                 getTotalCartItems();
             }
         });
@@ -182,6 +183,16 @@ public class Homepage {
             }
         });
         panel.add(cartButton, BorderLayout.CENTER);
+
+        JButton viewOrdersButton = new JButton("View Orders" + " (" + "e" + ")");
+        viewOrdersButton.setBackground(Color.decode(themeColors.getColor("secondary")));
+        viewOrdersButton.setForeground(Color.decode(themeColors.getColor("text")));
+        viewOrdersButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // TODO: Show orders
+            }
+        });
+        panel.add(viewOrdersButton, BorderLayout.WEST);
 
         JButton logoutButton = new JButton("Logout");
         logoutButton.setBackground(Color.decode(themeColors.getColor("secondary")));

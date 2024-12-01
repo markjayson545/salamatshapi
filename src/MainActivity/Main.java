@@ -2,8 +2,6 @@ package MainActivity;
 
 import javax.swing.*;
 
-import LoggedIn.Cart;
-import LoggedIn.Homepage;
 import Theme.Components;
 import Theme.DevSettings;
 import UserAuth.Login;
