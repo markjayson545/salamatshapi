@@ -7,12 +7,13 @@ public class UserCredentials {
     public boolean registerUser(String username, String password) {
         try {
             File file = new File("src/UserAuth/userCredentials.txt");
+            if (!file.exists()) {
+                file.createNewFile();
+            }
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
             String currentUsername = null;
-
-            RegistrationMessages registrationMessages = new RegistrationMessages();
 
             while ((line = bufferedReader.readLine()) != null) {
                 if (line.startsWith("Username: ")) {

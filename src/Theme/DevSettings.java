@@ -1,27 +1,32 @@
 package Theme;
 
 public class DevSettings {
-    String appName = "Shapi";
+    String appName = "Salamat Shapi";
 
     int width = 500;
     int height = 650;
 
     boolean isAlwaysOnTop = true;
-    boolean isResizable = false;
+    boolean isResizable = true;
     boolean isVisible = true;
     boolean isCentered = true;
+    boolean isLoggedIn = true;
 
     public boolean getSetting(String setting) {
-        if (setting.equals("alwaysOnTop")) {
+        switch (setting) {
+            case "alwaysOnTop":
             return isAlwaysOnTop;
-        } else if (setting.equals("resizable")) {
+            case "resizable":
             return isResizable;
-        } else if (setting.equals("visible")) {
+            case "visible":
             return isVisible;
-        } else if (setting.equals("centered")) {
+            case "centered":
             return isCentered;
+            case "isLoggedIn":
+            return isLoggedIn;
+            default:
+            return false;
         }
-        return false;
     }
 
     public int getDimension(String dimension) {

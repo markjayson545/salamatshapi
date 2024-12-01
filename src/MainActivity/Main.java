@@ -2,6 +2,8 @@ package MainActivity;
 
 import javax.swing.*;
 
+import LoggedIn.Cart;
+import LoggedIn.Homepage;
 import Theme.Components;
 import Theme.DevSettings;
 import UserAuth.Login;
@@ -14,16 +16,12 @@ public class Main {
     public void showHomepage() {
         Theme.Colors themeColors = new Theme.Colors();
         String primaryColor = themeColors.getColor("primary");
-        String secondaryColor = themeColors.getColor("secondary");
         String headerColor = themeColors.getColor("header");
         String subHeaderColor = themeColors.getColor("subHeader");
-        String textColor = themeColors.getColor("text");
 
         DevSettings devSettings = new DevSettings();
 
         Components components = new Components();
-
-        
 
         JFrame frame = new JFrame("Home");
 
@@ -104,6 +102,11 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         Main main = new Main();
-        main.showHomepage();
+        DevSettings devSettings = new DevSettings();
+        if (devSettings.getSetting("isLoggedIn")) {
+            main.showHomepage();
+        } else{
+            main.showHomepage();
+        }
     }
 }

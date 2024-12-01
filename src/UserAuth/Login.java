@@ -4,19 +4,20 @@ import javax.swing.*;
 import MainActivity.Main;
 import Theme.Components;
 import Theme.DevSettings;
+import UserFiles.UserFileHandler;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.event.*;
+
+import LoggedIn.Homepage;
 
 public class Login {
 
     public void showLogin() {
         Theme.Colors themeColors = new Theme.Colors();
         String primaryColor = themeColors.getColor("primary");
-        String secondaryColor = themeColors.getColor("secondary");
         String headerColor = themeColors.getColor("header");
-        String textColor = themeColors.getColor("text");
 
         DevSettings devSettings = new DevSettings();
         Components components = new Components();
@@ -49,17 +50,21 @@ public class Login {
             }
         });
 
-        JLabel userNameLabel = new JLabel("Username");
-        userNameLabel.setForeground(Color.decode(textColor));
-        JTextField userName = new JTextField(20);
-        userName.setPreferredSize(new Dimension(200, 30));
+        JLabel userNameLabel = components.createTextFieldLabel("Username");
+        JTextField userName = components.createTextField(20);
 
-        JLabel passwordLabel = new JLabel("Password");
-        passwordLabel.setForeground(Color.decode(textColor));
-        JPasswordField passwordField = new JPasswordField(20);
-        passwordField.setPreferredSize(new Dimension(200, 30));
-
+        JLabel passwordLabel = components.createTextFieldLabel("Password");
+        JPasswordField passwordField = components.createPasswordField(20);
         JButton button = components.createButton("Login");
+
+        // Allow user to press enter to login
+        passwordField.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    button.doClick();
+                }
+            }
+        });
 
         // Check if username and password fields are not empty
         // before enabling the login button
@@ -92,9 +97,13 @@ public class Login {
                 UserCredentials userCredentials = new UserCredentials();
                 boolean loginStatus = userCredentials.loginUser(username, password);
                 if (loginStatus) {
-                    JOptionPane.showMessageDialog(frame, "Login successful");
+                    UserFileHandler userFileHandler = new UserFileHandler();
+                    userFileHandler.createUserFile(username);
+                    frame.dispose();
+                    Homepage homepage = new Homepage(username);
+                    homepage.showHomepage();
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Login failed");
+                    JOptionPane.showMessageDialog(frame, "Login failed"+ "\n" + "Please check your username and password");
                 }
             }
         });

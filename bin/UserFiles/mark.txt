@@ -1,0 +1,10 @@
+ItemName: Product 4
+Description: Description 4
+Price: 400
+Amount: 3
+------------------------
+ItemName: Product 3
+Description: Description 3
+Price: 300
+Amount: 2
+------------------------

@@ -8,7 +8,7 @@ import Theme.Components;
 import Theme.DevSettings;
 
 import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 public class Register {
 
@@ -33,9 +33,6 @@ public class Register {
         JFrame frame = new JFrame("Register");
         Theme.Colors themeColors = new Theme.Colors();
         String primaryColor = themeColors.getColor("primary");
-        String secondaryColor = themeColors.getColor("secondary");
-        String textColor = themeColors.getColor("text");
-
         DevSettings devSettings = new DevSettings();
         Components components = new Components();
 
@@ -66,24 +63,26 @@ public class Register {
             }
         });
 
-        JLabel userNameLabel = new JLabel("Username");
-        userNameLabel.setForeground(Color.decode(textColor));
-        JTextField userName = new JTextField(20);
-        userName.setPreferredSize(new Dimension(200, 30));
+        JLabel userNameLabel = components.createTextFieldLabel("Username");
 
-        JLabel passwordLabel = new JLabel("Password");
-        passwordLabel.setForeground(Color.decode(textColor));
-        JPasswordField passwordField = new JPasswordField(20);
+        JTextField userName = components.createTextField(20);
 
-        passwordField.setPreferredSize(new Dimension(200, 30));
+        JLabel passwordLabel = components.createTextFieldLabel("Password");
+        JPasswordField passwordField = components.createPasswordField(20);
 
-        JLabel confirmPasswordLabel = new JLabel("Confirm Password");
-        confirmPasswordLabel.setForeground(Color.decode(textColor));
-        JPasswordField confirmPasswordField = new JPasswordField(20);
-        confirmPasswordField.setPreferredSize(new Dimension(200, 30));
-
+        JLabel confirmPasswordLabel = components.createTextFieldLabel("Confirm Password");
+        JPasswordField confirmPasswordField = components.createPasswordField(20);
         JButton registerButton = components.createButton("Register");
 
+        // Allow user to press enter to register
+        confirmPasswordField.addKeyListener(new KeyAdapter(){
+            public void keyPressed(KeyEvent e){
+                if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                    registerButton.doClick();
+                }
+            }
+        });
+        
         // Check if the fields are filled
         // Disable the button if the fields are empty
         registerButton.setEnabled(false);
