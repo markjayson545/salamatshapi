@@ -1,42 +1,19 @@
 package UserAuth;
-
-import java.io.*;
+import java.sql.*;
 
 public class UserCredentials {
 
     public boolean registerUser(String username, String password) {
         try {
-            File file = new File("src/UserAuth/userCredentials.txt");
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String line;
-            String currentUsername = null;
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserAuth/userCredentials.db");
+            Statement statement = connection.createStatement();
+            String createTable = "CREATE TABLE IF NOT EXISTS userCredentials (username TEXT PRIMARY KEY, password TEXT)";
+            statement.execute(createTable);
+            String insertData = "INSERT INTO userCredentials (username, password) VALUES ('" + username + "', '" + password + "')";
+            statement.execute(insertData);
+            statement.close();
+            connection.close();
 
-            while ((line = bufferedReader.readLine()) != null) {
-                if (line.startsWith("Username: ")) {
-                    currentUsername = line.substring(10);
-                    if (currentUsername.equals(username)) {
-                        bufferedReader.close();
-                        return false;
-                    }
-                }
-            }
-            bufferedReader.close();
-            FileWriter fileWriter = new FileWriter(file, true);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            
-            // Writing username and password with clear separation
-            bufferedWriter.write("Username: " + username);
-            bufferedWriter.newLine();
-            bufferedWriter.write("Password: " + password);
-            bufferedWriter.newLine();
-            bufferedWriter.write("------------------------");
-            bufferedWriter.newLine();
-            
-            bufferedWriter.close();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -46,25 +23,17 @@ public class UserCredentials {
 
     public boolean loginUser(String username, String password) {
         try {
-            File file = new File("src/UserAuth/userCredentials.txt");
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String line;
-            String currentUsername = null;
-            String currentPassword = null;
-
-            while ((line = bufferedReader.readLine()) != null) {
-                if (line.startsWith("Username: ")) {
-                    currentUsername = line.substring(10);
-                } else if (line.startsWith("Password: ")) {
-                    currentPassword = line.substring(10);
-                    if (currentUsername.equals(username) && currentPassword.equals(password)) {
-                        bufferedReader.close();
-                        return true;
-                    }
-                }
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserAuth/userCredentials.db");
+            Statement statement = connection.createStatement();
+            String selectData = "SELECT * FROM userCredentials WHERE username = '" + username + "' AND password = '" + password + "'";
+            ResultSet resultSet = statement.executeQuery(selectData);
+            if (resultSet.next()) {
+                statement.close();
+                connection.close();
+                return true;
             }
-            bufferedReader.close();
+            statement.close();
+            connection.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

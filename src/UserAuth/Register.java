@@ -161,6 +161,7 @@ public class Register {
         gbc.gridy = 8;
 
         gbc.insets = new Insets(10, 0, 10, 0);
+        
         // Align to the center
         gbc.anchor = GridBagConstraints.CENTER;
         frame.add(registerButton, gbc);

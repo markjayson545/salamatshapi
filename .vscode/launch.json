@@ -15,7 +15,10 @@
             "type": "java",
             "name": "Current File",
             "request": "launch",
-            "mainClass": "${file}"
+            "mainClass": "${file}",
+            "classPaths": [
+                "${workspaceFolder}/lib/*.jar"
+            ]
         },
         {
             "type": "java",
