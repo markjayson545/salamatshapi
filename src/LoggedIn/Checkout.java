@@ -24,12 +24,13 @@ public class Checkout {
     private double totalPrice = userFileHandler.getTotalPrice(username);
     private double shippingPrice = 60.00;
     JLabel totalLabel = new JLabel("Total: ₱" + userFileHandler.getTotalPrice(username));
+
     private void updateTotalPrice() {
         totalPrice = userFileHandler.getTotalPrice(username) + shippingPrice;
         totalLabel.setText("Total: ₱" + totalPrice);
     }
 
-    private JPanel createItemContainer(String itemName, String description, double price, int quantity){
+    private JPanel createItemContainer(String itemName, String description, double price, int quantity) {
         JPanel itemContainer = new JPanel();
         itemContainer.setBackground(Color.decode(themeColors.getColor("primary")));
         itemContainer.setPreferredSize(new Dimension(545, 75));
@@ -73,7 +74,7 @@ public class Checkout {
         return itemContainer;
     }
 
-    public void showCheckout(){
+    public void showCheckout() {
         JFrame frame = new JFrame("Checkout");
 
         updateTotalPrice();
@@ -127,10 +128,10 @@ public class Checkout {
         JPanel checkoutItemsContainer = new JPanel();
         checkoutItemsContainer.setBackground(Color.decode(themeColors.getColor("subHeader")));
         checkoutItemsContainer.setLayout(null); // Use absolute positioning
-        
+
         int yPosition = 10;
         int totalHeight = 0;
-        
+
         // CheckOut Items
         for (String[] cartItem : cartItems) {
             String itemName = cartItem[0];
@@ -141,11 +142,11 @@ public class Checkout {
             JPanel itemContainer = createItemContainer(itemName, description, price, quantity);
             itemContainer.setBounds(2, yPosition, 545, 75);
             checkoutItemsContainer.add(itemContainer);
-            
+
             yPosition += 85; // 75 height + 10 spacing
             totalHeight = yPosition;
         }
-        
+
         // Set the container size based on content
         checkoutItemsContainer.setPreferredSize(new Dimension(550, totalHeight));
 
@@ -155,11 +156,11 @@ public class Checkout {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        
+
         frame.add(scrollPane, gbc);
 
         gbc.gridy = 3;
-        
+
         // Shipping Cost
         JPanel footerPanel = new JPanel();
         footerPanel.setBackground(Color.decode(themeColors.getColor("primary")));
@@ -203,13 +204,14 @@ public class Checkout {
         checkoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Checkout
+                Payment payment = new Payment(username, cartItems, totalPrice, shippingPrice);
+                payment.showPayment();
+                frame.dispose();
             }
         });
         checkoutButtonPanel.add(checkoutButton);
 
         footerPanel.add(checkoutButtonPanel);
-
 
     }
 

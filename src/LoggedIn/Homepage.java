@@ -241,7 +241,12 @@ public class Homepage {
             mainPanel.add(createProductPanel(product[0], product[1], product[2]));
         }
 
-        frame.add(mainPanel, gbc);
+        // Wrap mainPanel in a JScrollPane
+        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        scrollPane.setPreferredSize(new Dimension(780, 470));
+
+        // Add scrollPane to the frame instead of mainPanel
+        frame.add(scrollPane, gbc);
 
         frame.setVisible(true);
     }

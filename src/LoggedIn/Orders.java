@@ -3,7 +3,6 @@ package LoggedIn;
 import javax.swing.*;
 import java.awt.*;
 
-import Theme.Colors;
 import Theme.DevSettings;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
