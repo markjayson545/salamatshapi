@@ -27,13 +27,25 @@ public class UserFileHandler {
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
             Statement statement = connection.createStatement();
-            String createTable = "CREATE TABLE IF NOT EXISTS " + username + "cart"
-                    + " (itemName TEXT, description TEXT, price TEXT, amount INTEGER)";
-            statement.execute(createTable);
-            String insertData = "INSERT INTO " + username + "cart"
-                    + " (itemName, description, price, amount) VALUES ('" + itemName + "', '" + description + "', '"
-                    + price + "', " + quantity + ")";
-            statement.execute(insertData);
+            
+            String selectData = "SELECT amount FROM " + username + "cart" + " WHERE itemName = '" + itemName + "'";
+            ResultSet resultSet = statement.executeQuery(selectData);
+            
+            if (resultSet.next()) {
+                int currentAmount = resultSet.getInt("amount");
+                String updateData = "UPDATE " + username + "cart" + " SET amount = " + (currentAmount + quantity) 
+                        + " WHERE itemName = '" + itemName + "'";
+                statement.execute(updateData);
+            } else {
+                String createTable = "CREATE TABLE IF NOT EXISTS " + username + "cart"
+                        + " (itemName TEXT, description TEXT, price TEXT, amount INTEGER)";
+                statement.execute(createTable);
+                String insertData = "INSERT INTO " + username + "cart"
+                        + " (itemName, description, price, amount) VALUES ('" + itemName + "', '" + description + "', '"
+                        + price + "', " + quantity + ")";
+                statement.execute(insertData);
+            }
+            
             statement.close();
             connection.close();
         } catch (Exception e) {
@@ -163,6 +175,21 @@ public class UserFileHandler {
         String[][] orders;
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
+            String selectData = "SELECT * FROM" + username + "order";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(selectData);
+            List<String[]> orderList = new ArrayList<>();
+            while (resultSet.next()) {
+                String[] order = new String[3];
+                order[0] = String.valueOf(resultSet.getInt("orderID"));
+                order[1] = resultSet.getString("items");
+                order[2] = resultSet.getString("totalPrice");
+                orderList.add(order);
+            }
+            orders = orderList.toArray(new String[orderList.size()][3]);
+            statement.close();
+            connection.close();
+            return orders;
         } catch (Exception e) {
             e.printStackTrace();
         }

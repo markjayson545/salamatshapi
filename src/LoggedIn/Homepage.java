@@ -20,7 +20,8 @@ public class Homepage {
 
     private int totalCartItems = 0;
     JButton cartButton = new JButton("View Cart" + " (" + totalCartItems + ")");
-    private void getTotalCartItems(){
+
+    private void getTotalCartItems() {
         UserFileHandler userFileHandler = new UserFileHandler();
         int quantity = 0;
         String[][] cartItems = userFileHandler.getCartItems(username);
@@ -32,10 +33,9 @@ public class Homepage {
     }
 
     private JPanel createProductPanel(String productName, String description, String price) {
-
         Theme.Colors themeColors = new Theme.Colors();
         JPanel productContainer = new JPanel();
-        
+
         productContainer.setBackground(Color.decode(themeColors.getColor("primary")));
         productContainer.setPreferredSize(new Dimension(150, 150));
         productContainer.setLayout(new GridBagLayout());
@@ -189,7 +189,10 @@ public class Homepage {
         viewOrdersButton.setForeground(Color.decode(themeColors.getColor("text")));
         viewOrdersButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // TODO: Show orders
+                UserFileHandler userFileHandler = new UserFileHandler();
+                String[][] userOrder = userFileHandler.getOrders(username);
+                Orders orders = new Orders(username, userOrder);
+                orders.showOrders();
             }
         });
         panel.add(viewOrdersButton, BorderLayout.WEST);
