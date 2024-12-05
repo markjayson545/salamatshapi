@@ -126,9 +126,11 @@ public class Checkout {
 
         JPanel checkoutItemsContainer = new JPanel();
         checkoutItemsContainer.setBackground(Color.decode(themeColors.getColor("subHeader")));
-        checkoutItemsContainer.setPreferredSize(new Dimension(550, 450));
-        checkoutItemsContainer.setLayout(new FlowLayout(FlowLayout.CENTER));
-
+        checkoutItemsContainer.setLayout(null); // Use absolute positioning
+        
+        int yPosition = 10;
+        int totalHeight = 0;
+        
         // CheckOut Items
         for (String[] cartItem : cartItems) {
             String itemName = cartItem[0];
@@ -137,9 +139,24 @@ public class Checkout {
             int quantity = Integer.parseInt(cartItem[3]);
 
             JPanel itemContainer = createItemContainer(itemName, description, price, quantity);
+            itemContainer.setBounds(2, yPosition, 545, 75);
             checkoutItemsContainer.add(itemContainer);
+            
+            yPosition += 85; // 75 height + 10 spacing
+            totalHeight = yPosition;
         }
-        frame.add(checkoutItemsContainer, gbc);
+        
+        // Set the container size based on content
+        checkoutItemsContainer.setPreferredSize(new Dimension(550, totalHeight));
+
+        JScrollPane scrollPane = new JScrollPane(checkoutItemsContainer);
+        scrollPane.setPreferredSize(new Dimension(550, 450));
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        
+        frame.add(scrollPane, gbc);
 
         gbc.gridy = 3;
         

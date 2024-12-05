@@ -9,6 +9,13 @@
             "name": "Main",
             "request": "launch",
             "mainClass": "MainActivity.Main",
+            "projectName": "salamatshapi_acb35f72"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "MainActivity.Main",
             "projectName": "salamatshapi_1a771b92"
         },
         {
