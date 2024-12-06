@@ -204,9 +204,12 @@ public class Checkout {
         checkoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Payment payment = new Payment(username, cartItems, totalPrice, shippingPrice);
-                payment.showPayment();
+                userFileHandler.addOrder(username, cartItems);
+                userFileHandler.clearCart(username);
+                JOptionPane.showMessageDialog(null, "Checkout Successful!");
                 frame.dispose();
+                Homepage homepage = new Homepage(username);
+                homepage.showHomepage();
             }
         });
         checkoutButtonPanel.add(checkoutButton);

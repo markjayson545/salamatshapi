@@ -20,9 +20,9 @@ public class Homepage {
 
     private int totalCartItems = 0;
     JButton cartButton = new JButton("View Cart" + " (" + totalCartItems + ")");
+    UserFileHandler userFileHandler = new UserFileHandler();
 
     private void getTotalCartItems() {
-        UserFileHandler userFileHandler = new UserFileHandler();
         int quantity = 0;
         String[][] cartItems = userFileHandler.getCartItems(username);
         for (int i = 0; i < cartItems.length; i++) {
@@ -184,7 +184,9 @@ public class Homepage {
         });
         panel.add(cartButton, BorderLayout.CENTER);
 
-        JButton viewOrdersButton = new JButton("View Orders" + " (" + "e" + ")");
+        int orderNumbers = userFileHandler.getTotalGroupedOrders(username);
+
+        JButton viewOrdersButton = new JButton("View Orders" + " (" + orderNumbers + ")");
         viewOrdersButton.setBackground(Color.decode(themeColors.getColor("secondary")));
         viewOrdersButton.setForeground(Color.decode(themeColors.getColor("text")));
         viewOrdersButton.addActionListener(new ActionListener() {

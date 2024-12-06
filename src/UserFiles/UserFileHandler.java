@@ -15,7 +15,14 @@ public class UserFileHandler {
             String createCartTable = "CREATE TABLE IF NOT EXISTS " + username + "cart"
                     + " (itemName TEXT, description TEXT, price TEXT, amount INTEGER)";
             String createOrderTable = "CREATE TABLE IF NOT EXISTS " + username + "orders"
-                    + " (orderID INTEGER PRIMARY KEY AUTOINCREMENT, items TEXT, totalPrice TEXT, status TEXT, estimatedDeliveryDate TEXT)";
+                    + " (orderID INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + "groupOrderID INTEGER, "
+                    + "itemName TEXT, "
+                    + "description TEXT, "
+                    + "price TEXT, "
+                    + "amount INTEGER, "
+                    + "status TEXT, "
+                    + "estimatedDeliveryDate TEXT)";
             statement.execute(createTable);
             statement.execute(createCartTable);
             statement.execute(createOrderTable);
@@ -179,16 +186,32 @@ public class UserFileHandler {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
             Statement statement = connection.createStatement();
             String createTable = "CREATE TABLE IF NOT EXISTS " + username + "orders"
-                    + " (orderID INTEGER PRIMARY KEY AUTOINCREMENT, items TEXT, totalPrice TEXT, status TEXT, estimatedDeliveryDate TEXT)";
+                    + " (orderID INTEGER PRIMARY KEY AUTOINCREMENT, itemName TEXT, description TEXT, price TEXT, amount INTEGER, status TEXT, estimatedDeliveryDate TEXT)";
             statement.execute(createTable);
+            
+            // Get the next group order ID
+            String maxGroupIdQuery = "SELECT COALESCE(MAX(groupOrderID), 0) as maxGroup FROM " + username + "orders";
+            ResultSet rs = statement.executeQuery(maxGroupIdQuery);
+            int groupOrderID = rs.next() ? rs.getInt("maxGroup") + 1 : 1;
+            
             String status = "To Ship";
             String estimatedDeliveryDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis() + 3 * 24 * 60 * 60 * 1000));
             for (String[] item : items) {
-                String insertData = "INSERT INTO " + username + "orders"
-                        + " (items, totalPrice, status, estimatedDeliveryDate) VALUES ('" + Arrays.toString(item) + "', '"
-                        + getTotalPrice(username) + "', '" + status + "', '" + estimatedDeliveryDate + "')";
-                statement.execute(insertData);
+                PreparedStatement pstmt = connection.prepareStatement(
+                    "INSERT INTO " + username + "orders (groupOrderID, itemName, description, price, amount, status, estimatedDeliveryDate) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)"
+                );
+                pstmt.setInt(1, groupOrderID);
+                pstmt.setString(2, item[0]);
+                pstmt.setString(3, item[1]);
+                pstmt.setString(4, item[2]);
+                pstmt.setInt(5, Integer.parseInt(item[3]));
+                pstmt.setString(6, status);
+                pstmt.setString(7, estimatedDeliveryDate);
+                pstmt.executeUpdate();
+                pstmt.close();
             }
+            
             statement.close();
             connection.close();
             System.out.println("Order added for user: " + username);
@@ -197,21 +220,18 @@ public class UserFileHandler {
         }
     }
 
-    public int getTotalOrders(String username) {
-        System.out.println("Getting total orders for user: " + username);
+    public int getTotalGroupedOrders(String username) {
+        System.out.println("Getting total grouped orders for user: " + username);
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
             Statement statement = connection.createStatement();
-            String selectData = "SELECT * FROM " + username + "orders";
+            String selectData = "SELECT COUNT(DISTINCT groupOrderID) as totalGroupedOrders FROM " + username + "orders";
             ResultSet resultSet = statement.executeQuery(selectData);
-            int totalOrders = 0;
-            while (resultSet.next()) {
-                totalOrders++;
-            }
+            int totalGroupedOrders = resultSet.next() ? resultSet.getInt("totalGroupedOrders") : 0;
             statement.close();
             connection.close();
-            System.out.println("Total orders retrieved for user: " + username + ". Total orders: " + totalOrders);
-            return totalOrders;
+            System.out.println("Total grouped orders retrieved for user: " + username + ". Total grouped orders: " + totalGroupedOrders);
+            return totalGroupedOrders;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -253,19 +273,23 @@ public class UserFileHandler {
         String[][] orders;
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
-            String selectData = "SELECT * FROM " + username + "orders";
+            String selectData = "SELECT * FROM " + username + "orders ORDER BY groupOrderID DESC, orderID ASC";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(selectData);
             List<String[]> orderList = new ArrayList<>();
             while (resultSet.next()) {
-                String[] order = new String[4];
+                String[] order = new String[8]; // Added one more field for groupOrderID
                 order[0] = String.valueOf(resultSet.getInt("orderID"));
-                order[1] = resultSet.getString("items");
-                order[2] = resultSet.getString("totalPrice");
-                order[3] = resultSet.getString("status");
+                order[1] = resultSet.getString("itemName");
+                order[2] = resultSet.getString("description");
+                order[3] = resultSet.getString("price");
+                order[4] = String.valueOf(resultSet.getInt("amount"));
+                order[5] = resultSet.getString("status");
+                order[6] = resultSet.getString("estimatedDeliveryDate");
+                order[7] = String.valueOf(resultSet.getInt("groupOrderID"));
                 orderList.add(order);
             }
-            orders = orderList.toArray(new String[orderList.size()][4]);
+            orders = orderList.toArray(new String[orderList.size()][8]);
             statement.close();
             connection.close();
             System.out.println("Orders retrieved for user: " + username);
