@@ -167,7 +167,7 @@ public class Cart extends UserFileHandler {
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                Homepage homepage = new Homepage(username);
+                Homepage homepage = new Homepage(username, false);
                 homepage.showHomepage();
             }
         });

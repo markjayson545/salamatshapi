@@ -207,7 +207,7 @@ public class Checkout extends UserFileHandler {
                 clearCart(username);
                 JOptionPane.showMessageDialog(null, "Checkout Successful!");
                 frame.dispose();
-                Homepage homepage = new Homepage(username);
+                Homepage homepage = new Homepage(username, false);
                 homepage.showHomepage();
             }
         });

@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.event.*;
 
+import Admin.AdminPanel;
 import LoggedIn.Homepage;
 
 public class Login {
@@ -95,15 +96,22 @@ public class Login {
                 String username = userName.getText();
                 String password = String.valueOf(passwordField.getPassword());
                 UserCredentials userCredentials = new UserCredentials();
+                boolean isAdmin = userCredentials.isAdminCred(username, password);
                 boolean loginStatus = userCredentials.loginUser(username, password);
+
                 if (loginStatus) {
                     UserFileHandler userFileHandler = new UserFileHandler();
                     userFileHandler.createUserFile(username);
                     frame.dispose();
-                    Homepage homepage = new Homepage(username);
+                    Homepage homepage = new Homepage(username, isAdmin);
                     homepage.showHomepage();
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Login failed"+ "\n" + "Please check your username and password");
+                } else if (isAdmin) {
+                    frame.dispose();
+                    AdminPanel adminPanel = new AdminPanel();
+                    adminPanel.showAdminPanel();
+                } 
+                else {
+                    JOptionPane.showMessageDialog(frame, "Login failed" + "\n" + "Please check your username and password");
                 }
             }
         });

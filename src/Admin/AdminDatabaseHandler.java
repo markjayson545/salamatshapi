@@ -5,6 +5,7 @@ import java.sql.*;
 public class AdminDatabaseHandler {
 
     private static final String ADMIN_CREDENTIALS_DB = "jdbc:sqlite:src/Database/AdminCredentials.db";
+    private static final String USER_ORDERS_DB = "jdbc:sqlite:src/Database/UserOrders.db";
     private static final String PRODUCTS_DB = "jdbc:sqlite:src/Database/Products.db";
 
     public void createDefaultAdmin() {
@@ -101,7 +102,8 @@ public class AdminDatabaseHandler {
                 String checkProduct = "SELECT * FROM Products WHERE productName = '" + product[0] + "'";
                 ResultSet resultSet = statement.executeQuery(checkProduct);
                 if (!resultSet.next()) {
-                    String insertData = "INSERT INTO Products (productName, description, price) VALUES ('" + product[0] + "', '"
+                    String insertData = "INSERT INTO Products (productName, description, price) VALUES ('" + product[0]
+                            + "', '"
                             + product[1] + "', '" + product[2] + "')";
                     statement.execute(insertData);
                 }
@@ -113,15 +115,41 @@ public class AdminDatabaseHandler {
         }
     }
 
-    public void addProduct(String productName, String description, String price) {
+    public void addProduct(String productName, String description, double price) {
         try {
             Connection connection = DriverManager.getConnection(PRODUCTS_DB);
             Statement statement = connection.createStatement();
             String createTable = "CREATE TABLE IF NOT EXISTS Products (productName TEXT PRIMARY KEY, description TEXT, price TEXT)";
-            String insertData = "INSERT INTO Products (productName, description, price) VALUES ('" + productName + "', '"
-                    + description + "', '" + price + "')";
+            String checkProduct = "SELECT * FROM Products WHERE productName = '" + productName + "'";
             statement.execute(createTable);
-            statement.execute(insertData);
+            ResultSet resultSet = statement.executeQuery(checkProduct);
+            String parsePrice = Double.toString(price);
+            if (!resultSet.next()) {
+                String insertData = "INSERT INTO Products (productName, description, price) VALUES ('" + productName
+                        + "', '"
+                        + description + "', '" + parsePrice + "')";
+                statement.execute(insertData);
+            }
+            statement.close();
+            connection.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void updateProduct(String currentProductname, String newProductName, String description, String price) {
+        try {
+            Connection connection = DriverManager.getConnection(PRODUCTS_DB);
+            Statement statement = connection.createStatement();
+            String checkProduct = "SELECT * FROM Products WHERE productName = '" + newProductName
+                    + "' AND productName != '" + currentProductname + "'";
+            ResultSet resultSet = statement.executeQuery(checkProduct);
+            if (!resultSet.next()) {
+                String updateData = "UPDATE Products SET productName = '" + newProductName + "', description = '"
+                        + description
+                        + "', price = '" + price + "' WHERE productName = '" + currentProductname + "'";
+                statement.execute(updateData);
+            }
             statement.close();
             connection.close();
         } catch (Exception e) {
@@ -172,7 +200,13 @@ public class AdminDatabaseHandler {
         }
     }
 
-    public void updateProduct(String productName, String description, String price) {
-
+    public String[][] getUserOrders() {
+        String[][] userOrders = null;
+        try {
+            
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return userOrders;
     }
 }

@@ -1,4 +1,4 @@
-package LoggedIn;
+package Admin;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,14 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 
-public class Orders {
-    private String username;
+public class ManageOrders {
     private String[][] orders;
     private JPanel orderContainerPanel;
     private JScrollPane scrollPane;
 
-    public Orders(String username, String[][] orders) {
-        this.username = username;
+    public ManageOrders(String username, String[][] orders) {
         this.orders = orders;
     }
 
@@ -196,8 +194,8 @@ public class Orders {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                Homepage homepage = new Homepage(username, false);
-                homepage.showHomepage();
+                AdminPanel adminPanel = new AdminPanel();
+                adminPanel.showAdminPanel();
             }
         });
         headerPanel.add(backButton);

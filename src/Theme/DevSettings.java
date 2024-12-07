@@ -6,7 +6,7 @@ public class DevSettings {
     int width = 500;
     int height = 650;
 
-    boolean isAlwaysOnTop = false;
+    boolean isAlwaysOnTop = true;
     boolean isResizable = true;
     boolean isVisible = true;
     boolean isCentered = true;
