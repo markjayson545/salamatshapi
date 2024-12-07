@@ -2,6 +2,7 @@ package MainActivity;
 
 import javax.swing.*;
 
+import Admin.AdminDatabaseHandler;
 import Theme.Components;
 import Theme.DevSettings;
 import UserAuth.Login;
@@ -99,12 +100,10 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
+        AdminDatabaseHandler  adminDatabaseHandler = new AdminDatabaseHandler();
+        adminDatabaseHandler.addDefaultProducts();
+        adminDatabaseHandler.createDefaultAdmin();
         Main main = new Main();
-        DevSettings devSettings = new DevSettings();
-        if (devSettings.getSetting("isLoggedIn")) {
-            main.showHomepage();
-        } else{
-            main.showHomepage();
-        }
+        main.showHomepage();
     }
 }

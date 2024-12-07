@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Checkout {
+public class Checkout extends UserFileHandler {
 
     String username;
     String[][] cartItems;
@@ -17,16 +17,15 @@ public class Checkout {
         this.cartItems = cartItems;
     }
 
-    UserFileHandler userFileHandler = new UserFileHandler();
     Theme.Colors themeColors = new Theme.Colors();
     DevSettings devSettings = new DevSettings();
 
-    private double totalPrice = userFileHandler.getTotalPrice(username);
+    private double totalPrice = getTotalPrice(username);
     private double shippingPrice = 60.00;
-    JLabel totalLabel = new JLabel("Total: ₱" + userFileHandler.getTotalPrice(username));
+    JLabel totalLabel = new JLabel("Total: ₱" + getTotalPrice(username));
 
     private void updateTotalPrice() {
-        totalPrice = userFileHandler.getTotalPrice(username) + shippingPrice;
+        totalPrice = getTotalPrice(username) + shippingPrice;
         totalLabel.setText("Total: ₱" + totalPrice);
     }
 
@@ -204,8 +203,8 @@ public class Checkout {
         checkoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                userFileHandler.addOrder(username, cartItems);
-                userFileHandler.clearCart(username);
+                addOrder(username, cartItems);
+                clearCart(username);
                 JOptionPane.showMessageDialog(null, "Checkout Successful!");
                 frame.dispose();
                 Homepage homepage = new Homepage(username);

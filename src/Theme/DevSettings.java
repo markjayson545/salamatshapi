@@ -6,11 +6,11 @@ public class DevSettings {
     int width = 500;
     int height = 650;
 
-    boolean isAlwaysOnTop = true;
+    boolean isAlwaysOnTop = false;
     boolean isResizable = true;
     boolean isVisible = true;
     boolean isCentered = true;
-    boolean isLoggedIn = true;
+    boolean isLoggedIn = false;
 
     public boolean getSetting(String setting) {
         switch (setting) {

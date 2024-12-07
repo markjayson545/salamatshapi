@@ -8,20 +8,19 @@ import javax.swing.*;
 import Theme.DevSettings;
 import UserFiles.UserFileHandler;
 
-public class Cart {
+public class Cart extends UserFileHandler {
     private String username;
 
     public Cart(String username) {
         this.username = username;
     }
 
-    UserFileHandler userFileHandler = new UserFileHandler();
-    private double totalPrice = userFileHandler.getTotalPrice(username);
-    private JLabel totalLabel = new JLabel("Total: ₱" + userFileHandler.getTotalPrice(username));
+    private double totalPrice = getTotalPrice(username);
+    private JLabel totalLabel = new JLabel("Total: ₱" + getTotalPrice(username));
     private JButton checkoutButton = new JButton("Checkout");
 
     private void updateTotalPrice() {
-        totalPrice = userFileHandler.getTotalPrice(username);
+        totalPrice = getTotalPrice(username);
         totalLabel.setText("Total: ₱" + totalPrice);
         checkoutButton.setEnabled(totalPrice > 0);
     }
@@ -99,7 +98,7 @@ public class Cart {
                 if (getQuantity[0] > 1) {
                     getQuantity[0]--;
                     quantityLabel.setText(String.valueOf(getQuantity[0]));
-                    userFileHandler.decrementItemAmount(username, productName);
+                    decrementItemAmount(username, productName);
                     updateTotalPrice();
                 }
 
@@ -111,7 +110,7 @@ public class Cart {
                 if (getQuantity[0] >= 1) {
                     getQuantity[0]++;
                     quantityLabel.setText(String.valueOf(getQuantity[0]));
-                    userFileHandler.addItemToCart(username, productName, description, 1, price);
+                    addItemToCart(username, productName, description, 1, price);
                     updateTotalPrice();
                 }
             }
@@ -119,7 +118,7 @@ public class Cart {
 
         removeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                userFileHandler.deleteItem(username, productName);
+                deleteItem(username, productName);
                 productContainer.setVisible(false);
                 updateTotalPrice();
             }
@@ -181,7 +180,7 @@ public class Cart {
         cartContainer.setPreferredSize(new Dimension(780, 470));
         cartContainer.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        String[][] cartItems = userFileHandler.getCartItems(username);
+        String[][] cartItems = getCartItems(username);
 
         for (String item[] : cartItems) {
             cartContainer.add(createCartItemPanel(item[0], item[1], Integer.parseInt(item[3]), item[2]));

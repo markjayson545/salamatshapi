@@ -3,17 +3,27 @@ package UserFiles;
 import java.util.*;
 import java.util.Date;
 import java.sql.*;
-import java.text.SimpleDateFormat;;
+import java.text.SimpleDateFormat;
 
 public class UserFileHandler {
+    private static final String CART_DB = "jdbc:sqlite:src/Database/UsersCarts.db";
+    private static final String ORDER_DB = "jdbc:sqlite:src/Database/UsersOrders.db";
+
     public void createUserFile(String username) {
         System.out.println("Creating user file for: " + username);
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
-            Statement statement = connection.createStatement();
-            String createTable = "CREATE TABLE IF NOT EXISTS " + username + " (username TEXT, password TEXT)";
+            // Create cart table
+            Connection cartConnection = DriverManager.getConnection(CART_DB);
+            Statement cartStatement = cartConnection.createStatement();
             String createCartTable = "CREATE TABLE IF NOT EXISTS " + username + "cart"
                     + " (itemName TEXT, description TEXT, price TEXT, amount INTEGER)";
+            cartStatement.execute(createCartTable);
+            cartStatement.close();
+            cartConnection.close();
+
+            // Create order table
+            Connection orderConnection = DriverManager.getConnection(ORDER_DB);
+            Statement orderStatement = orderConnection.createStatement();
             String createOrderTable = "CREATE TABLE IF NOT EXISTS " + username + "orders"
                     + " (orderID INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + "groupOrderID INTEGER, "
@@ -23,33 +33,34 @@ public class UserFileHandler {
                     + "amount INTEGER, "
                     + "status TEXT, "
                     + "estimatedDeliveryDate TEXT)";
-            statement.execute(createTable);
-            statement.execute(createCartTable);
-            statement.execute(createOrderTable);
-            statement.close();
-            connection.close();
-            System.out.println("User file created for: " + username);
+            orderStatement.execute(createOrderTable);
+            orderStatement.close();
+            orderConnection.close();
+            System.out.println("User files created for: " + username);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // Methods that work with cart database
     public void addItemToCart(String username, String itemName, String description, int quantity, String price) {
         System.out.println("Adding item to cart for user: " + username);
-        System.out.println("Item details - Name: " + itemName + ", Description: " + description + ", Quantity: " + quantity + ", Price: " + price);
+        System.out.println("Item details - Name: " + itemName + ", Description: " + description + ", Quantity: "
+                + quantity + ", Price: " + price);
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
+            Connection connection = DriverManager.getConnection(CART_DB);
             Statement statement = connection.createStatement();
-            
+
             String selectData = "SELECT amount FROM " + username + "cart" + " WHERE itemName = '" + itemName + "'";
             ResultSet resultSet = statement.executeQuery(selectData);
-            
+
             if (resultSet.next()) {
                 int currentAmount = resultSet.getInt("amount");
-                String updateData = "UPDATE " + username + "cart" + " SET amount = " + (currentAmount + quantity) 
+                String updateData = "UPDATE " + username + "cart" + " SET amount = " + (currentAmount + quantity)
                         + " WHERE itemName = '" + itemName + "'";
                 statement.execute(updateData);
-                System.out.println("Updated item amount in cart for user: " + username + ". New amount: " + (currentAmount + quantity));
+                System.out.println("Updated item amount in cart for user: " + username + ". New amount: "
+                        + (currentAmount + quantity));
             } else {
                 String createTable = "CREATE TABLE IF NOT EXISTS " + username + "cart"
                         + " (itemName TEXT, description TEXT, price TEXT, amount INTEGER)";
@@ -60,7 +71,6 @@ public class UserFileHandler {
                 statement.execute(insertData);
                 System.out.println("Inserted new item into cart for user: " + username);
             }
-            
             statement.close();
             connection.close();
         } catch (Exception e) {
@@ -72,7 +82,7 @@ public class UserFileHandler {
         System.out.println("Decrementing item amount in cart for user: " + username);
         System.out.println("Item name: " + itemName);
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
+            Connection connection = DriverManager.getConnection(CART_DB);
             Statement statement = connection.createStatement();
             String selectData = "SELECT * FROM " + username + "cart" + " WHERE itemName = '" + itemName + "'";
             ResultSet resultSet = statement.executeQuery(selectData);
@@ -82,7 +92,8 @@ public class UserFileHandler {
                 String updateData = "UPDATE " + username + "cart" + " SET amount = " + (currentAmount - 1)
                         + " WHERE itemName = '" + itemName + "'";
                 statement.execute(updateData);
-                System.out.println("Decremented item amount in cart for user: " + username + ". New amount: " + (currentAmount - 1));
+                System.out.println("Decremented item amount in cart for user: " + username + ". New amount: "
+                        + (currentAmount - 1));
             } else {
                 String deleteData = "DELETE FROM " + username + "cart" + " WHERE itemName = '" + itemName + "'";
                 statement.execute(deleteData);
@@ -98,7 +109,7 @@ public class UserFileHandler {
     public String[][] getCartItems(String username) {
         System.out.println("Getting cart items for user: " + username);
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
+            Connection connection = DriverManager.getConnection(CART_DB);
             Statement statement = connection.createStatement();
             String createTable = "CREATE TABLE IF NOT EXISTS " + username + "cart"
                     + " (itemName TEXT, description TEXT, price TEXT, amount INTEGER)";
@@ -127,7 +138,7 @@ public class UserFileHandler {
     public double getTotalPrice(String username) {
         System.out.println("Calculating total price for user: " + username);
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
+            Connection connection = DriverManager.getConnection(CART_DB);
             Statement statement = connection.createStatement();
             String createTable = "CREATE TABLE IF NOT EXISTS " + username + "cart"
                     + " (itemName TEXT, description TEXT, price TEXT, amount INTEGER)";
@@ -152,7 +163,7 @@ public class UserFileHandler {
         System.out.println("Deleting item from cart for user: " + username);
         System.out.println("Item name: " + itemName);
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
+            Connection connection = DriverManager.getConnection(CART_DB);
             Statement statement = connection.createStatement();
             String deleteData = "DELETE FROM " + username + "cart" + " WHERE itemName = '" + itemName + "'";
             statement.execute(deleteData);
@@ -167,7 +178,7 @@ public class UserFileHandler {
     public void clearCart(String username) {
         System.out.println("Clearing cart for user: " + username);
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
+            Connection connection = DriverManager.getConnection(CART_DB);
             Statement statement = connection.createStatement();
             String deleteData = "DELETE FROM " + username + "cart";
             statement.execute(deleteData);
@@ -179,28 +190,31 @@ public class UserFileHandler {
         }
     }
 
+    // Methods that work with order database
     public void addOrder(String username, String[][] items) {
         System.out.println("Adding order for user: " + username);
         System.out.println("Order items: " + Arrays.deepToString(items));
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
+            Connection connection = DriverManager.getConnection(ORDER_DB);
             Statement statement = connection.createStatement();
             String createTable = "CREATE TABLE IF NOT EXISTS " + username + "orders"
                     + " (orderID INTEGER PRIMARY KEY AUTOINCREMENT, itemName TEXT, description TEXT, price TEXT, amount INTEGER, status TEXT, estimatedDeliveryDate TEXT)";
             statement.execute(createTable);
-            
+
             // Get the next group order ID
             String maxGroupIdQuery = "SELECT COALESCE(MAX(groupOrderID), 0) as maxGroup FROM " + username + "orders";
             ResultSet rs = statement.executeQuery(maxGroupIdQuery);
             int groupOrderID = rs.next() ? rs.getInt("maxGroup") + 1 : 1;
-            
+
             String status = "To Ship";
-            String estimatedDeliveryDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis() + 3 * 24 * 60 * 60 * 1000));
+            String estimatedDeliveryDate = new SimpleDateFormat("yyyy-MM-dd")
+                    .format(new Date(System.currentTimeMillis() + 3 * 24 * 60 * 60 * 1000));
             for (String[] item : items) {
                 PreparedStatement pstmt = connection.prepareStatement(
-                    "INSERT INTO " + username + "orders (groupOrderID, itemName, description, price, amount, status, estimatedDeliveryDate) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)"
-                );
+                        "INSERT INTO " + username
+                                + "orders (groupOrderID, itemName, description, price, amount, status, estimatedDeliveryDate) "
+                                +
+                                "VALUES (?, ?, ?, ?, ?, ?, ?)");
                 pstmt.setInt(1, groupOrderID);
                 pstmt.setString(2, item[0]);
                 pstmt.setString(3, item[1]);
@@ -211,7 +225,7 @@ public class UserFileHandler {
                 pstmt.executeUpdate();
                 pstmt.close();
             }
-            
+
             statement.close();
             connection.close();
             System.out.println("Order added for user: " + username);
@@ -223,14 +237,15 @@ public class UserFileHandler {
     public int getTotalGroupedOrders(String username) {
         System.out.println("Getting total grouped orders for user: " + username);
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
+            Connection connection = DriverManager.getConnection(ORDER_DB);
             Statement statement = connection.createStatement();
             String selectData = "SELECT COUNT(DISTINCT groupOrderID) as totalGroupedOrders FROM " + username + "orders";
             ResultSet resultSet = statement.executeQuery(selectData);
             int totalGroupedOrders = resultSet.next() ? resultSet.getInt("totalGroupedOrders") : 0;
             statement.close();
             connection.close();
-            System.out.println("Total grouped orders retrieved for user: " + username + ". Total grouped orders: " + totalGroupedOrders);
+            System.out.println("Total grouped orders retrieved for user: " + username + ". Total grouped orders: "
+                    + totalGroupedOrders);
             return totalGroupedOrders;
         } catch (Exception e) {
             e.printStackTrace();
@@ -241,12 +256,12 @@ public class UserFileHandler {
     public void updateOrderStatus(String username) {
         System.out.println("Updating order status for user: " + username);
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
+            Connection connection = DriverManager.getConnection(ORDER_DB);
             Statement statement = connection.createStatement();
             String selectData = "SELECT * FROM " + username + "orders";
             ResultSet resultSet = statement.executeQuery(selectData);
             String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-            
+
             while (resultSet.next()) {
                 String estimatedDeliveryDate = resultSet.getString("estimatedDeliveryDate");
                 String status;
@@ -257,9 +272,11 @@ public class UserFileHandler {
                 } else {
                     continue;
                 }
-                String updateData = "UPDATE " + username + "orders SET status = '" + status + "' WHERE orderID = " + resultSet.getInt("orderID");
+                String updateData = "UPDATE " + username + "orders SET status = '" + status + "' WHERE orderID = "
+                        + resultSet.getInt("orderID");
                 statement.execute(updateData);
-                System.out.println("Order status updated for user: " + username + ". Order ID: " + resultSet.getInt("orderID") + ", New status: " + status);
+                System.out.println("Order status updated for user: " + username + ". Order ID: "
+                        + resultSet.getInt("orderID") + ", New status: " + status);
             }
             statement.close();
             connection.close();
@@ -272,7 +289,7 @@ public class UserFileHandler {
         System.out.println("Getting orders for user: " + username);
         String[][] orders;
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserFiles/Users.db");
+            Connection connection = DriverManager.getConnection(ORDER_DB);
             String selectData = "SELECT * FROM " + username + "orders ORDER BY groupOrderID DESC, orderID ASC";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(selectData);
@@ -299,5 +316,4 @@ public class UserFileHandler {
         }
         return new String[0][0];
     }
-
 }

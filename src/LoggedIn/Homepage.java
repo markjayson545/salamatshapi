@@ -5,12 +5,13 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import Admin.AdminDatabaseHandler;
 import MainActivity.Main;
 import Theme.Colors;
 import Theme.DevSettings;
 import UserFiles.UserFileHandler;
 
-public class Homepage {
+public class Homepage extends UserFileHandler {
 
     private String username;
 
@@ -20,11 +21,10 @@ public class Homepage {
 
     private int totalCartItems = 0;
     JButton cartButton = new JButton("View Cart" + " (" + totalCartItems + ")");
-    UserFileHandler userFileHandler = new UserFileHandler();
 
     private void getTotalCartItems() {
         int quantity = 0;
-        String[][] cartItems = userFileHandler.getCartItems(username);
+        String[][] cartItems = getCartItems(username);
         for (int i = 0; i < cartItems.length; i++) {
             quantity++;
         }
@@ -120,8 +120,7 @@ public class Homepage {
         productContainer.add(productButton, gbc);
         productButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                UserFileHandler userFileHandler = new UserFileHandler();
-                userFileHandler.addItemToCart(username, productName, description, quantity[0], price);
+                addItemToCart(username, productName, description, quantity[0], price);
                 JOptionPane.showMessageDialog(null, "Added to cart");
                 getTotalCartItems();
             }
@@ -184,15 +183,14 @@ public class Homepage {
         });
         panel.add(cartButton, BorderLayout.CENTER);
 
-        int orderNumbers = userFileHandler.getTotalGroupedOrders(username);
+        int orderNumbers = getTotalGroupedOrders(username);
 
         JButton viewOrdersButton = new JButton("View Orders" + " (" + orderNumbers + ")");
         viewOrdersButton.setBackground(Color.decode(themeColors.getColor("secondary")));
         viewOrdersButton.setForeground(Color.decode(themeColors.getColor("text")));
         viewOrdersButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                UserFileHandler userFileHandler = new UserFileHandler();
-                String[][] userOrder = userFileHandler.getOrders(username);
+                String[][] userOrder = getOrders(username);
                 Orders orders = new Orders(username, userOrder);
                 orders.showOrders();
             }
@@ -218,26 +216,19 @@ public class Homepage {
         // Main Content
         JPanel mainPanel = new JPanel();
         mainPanel.setBackground(Color.decode(themeColors.getColor("subHeader")));
-        mainPanel.setPreferredSize(new Dimension(780, 470));
         mainPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        String[][] productsList = {
-                { "Product 1", "Description 1", "100" },
-                { "Product 2", "Description 2", "200" },
-                { "Product 3", "Description 3", "300" },
-                { "Product 4", "Description 4", "400" },
-                { "Product 5", "Description 5", "500" },
-                { "Product 6", "Description 6", "600" },
-                { "Product 7", "Description 7", "700" },
-                { "Product 8", "Description 8", "800" },
-                { "Product 9", "Description 9", "900" },
-                { "Product 10", "Description 10", "1000" },
-                { "Product 11", "Description 11", "1100" },
-                { "Product 12", "Description 12", "1200" },
-                { "Product 13", "Description 13", "1300" },
-                { "Product 14", "Description 14", "1400" },
-                { "Product 15", "Description 15", "1500" },
-        };
+        AdminDatabaseHandler adminDatabaseHandler = new AdminDatabaseHandler();
+        String[][] productsList = adminDatabaseHandler.getProducts();
+
+        // Calculate required rows and height
+        int itemsPerRow = 5;
+        int rows = (int) Math.ceil(productsList.length / (double)itemsPerRow);
+        int baseHeight = 480;
+        int rowHeight = 170; // Height of each product panel + spacing
+        int calculatedHeight = Math.max(baseHeight, rows * rowHeight);
+        
+        mainPanel.setPreferredSize(new Dimension(780, calculatedHeight));
 
         for (String[] product : productsList) {
             mainPanel.add(createProductPanel(product[0], product[1], product[2]));
@@ -245,9 +236,10 @@ public class Homepage {
 
         // Wrap mainPanel in a JScrollPane
         JScrollPane scrollPane = new JScrollPane(mainPanel);
-        scrollPane.setPreferredSize(new Dimension(780, 470));
-
-        // Add scrollPane to the frame instead of mainPanel
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setPreferredSize(new Dimension(780, Math.min(calculatedHeight, 480)));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         frame.add(scrollPane, gbc);
 
         frame.setVisible(true);

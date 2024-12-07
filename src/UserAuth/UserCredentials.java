@@ -5,9 +5,9 @@ public class UserCredentials {
 
     public boolean registerUser(String username, String password) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserAuth/userCredentials.db");
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/Database/UserCredentials.db");
             Statement statement = connection.createStatement();
-            String createTable = "CREATE TABLE IF NOT EXISTS userCredentials (username TEXT PRIMARY KEY, password TEXT)";
+            String createTable = "CREATE TABLE IF NOT EXISTS UserCredentials (username TEXT PRIMARY KEY, password TEXT)";
             statement.execute(createTable);
             String insertData = "INSERT INTO userCredentials (username, password) VALUES ('" + username + "', '" + password + "')";
             statement.execute(insertData);
@@ -23,9 +23,9 @@ public class UserCredentials {
 
     public boolean loginUser(String username, String password) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/UserAuth/userCredentials.db");
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/Database/UserCredentials.db");
             Statement statement = connection.createStatement();
-            String selectData = "SELECT * FROM userCredentials WHERE username = '" + username + "' AND password = '" + password + "'";
+            String selectData = "SELECT * FROM UserCredentials WHERE username = '" + username + "' AND password = '" + password + "'";
             ResultSet resultSet = statement.executeQuery(selectData);
             if (resultSet.next()) {
                 statement.close();
