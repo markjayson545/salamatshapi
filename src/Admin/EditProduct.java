@@ -128,8 +128,6 @@ public class EditProduct extends AdminDatabaseHandler {
                     addProduct(productNameField.getText(), productDescriptionField.getText(),
                             Double.parseDouble(productPriceField.getText()));
                     frame.dispose();
-                    AdminPanel adminPanel = new AdminPanel();
-                    adminPanel.showAdminPanel();
                 }
             }
         });

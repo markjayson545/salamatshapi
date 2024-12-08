@@ -210,6 +210,10 @@ public class Homepage extends UserFileHandler {
         gbc.insets = new Insets(10, 0, 0, 0);
         gbc.gridy = 1;
 
+        if (isAdmin) {
+            frame.setTitle("View Products");
+        }
+
         // Top Bar
         JPanel panel = new JPanel();
         panel.setBackground(Color.decode(themeColors.getColor("primary")));

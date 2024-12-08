@@ -89,18 +89,22 @@ public class Orders {
         int yPosition = 10;
         int totalHeight = 0;
 
+        // Group orders by order ID (group ID)
         Map<String, java.util.List<String[]>> groupedOrders = new HashMap<>();
         for (String[] order : orders) {
-            if (order.length < 8) continue;  // Skip invalid orders
+            if (order.length < 8) continue;
+            
+            // Only add orders that match the filter
+            String status = order[5];
+            if (!filter.equals("All") && !status.equals(filter)) continue;
+            
             String groupId = order[7];
             groupedOrders.computeIfAbsent(groupId, k -> new ArrayList<>()).add(order);
         }
 
+        // Only process groups that have orders after filtering
         for (java.util.List<String[]> orderGroup : groupedOrders.values()) {
             if (orderGroup.isEmpty()) continue;
-            
-            String status = orderGroup.get(0)[5];
-            if (!filter.equals("All") && !status.equals(filter)) continue;
 
             // Create a container for each order group
             JPanel groupPanel = new JPanel();
@@ -143,10 +147,10 @@ public class Orders {
             totalPanel.add(totalLabel);
             groupPanel.add(totalPanel);
 
-            groupPanel.setBounds(2, yPosition, 545, orderGroup.size() * 115 + 50); // Increased height for total
+            groupPanel.setBounds(2, yPosition, 545, orderGroup.size() * 115 + 50);
             orderContainerPanel.add(groupPanel);
 
-            yPosition += (orderGroup.size() * 115) + 60; // Increased spacing for total
+            yPosition += (orderGroup.size() * 115) + 60;
             totalHeight = yPosition;
         }
 
