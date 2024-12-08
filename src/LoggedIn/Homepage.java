@@ -261,7 +261,7 @@ public class Homepage extends UserFileHandler {
                 public void actionPerformed(ActionEvent e) {
                     frame.dispose();
                     String[][] userOrder = getOrders(username);
-                    Orders orders = new Orders(username, userOrder, isAdmin, null);
+                    Orders orders = new Orders(username, userOrder);
                     orders.showOrders();
                 }
             });

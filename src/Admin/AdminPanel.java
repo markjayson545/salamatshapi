@@ -12,11 +12,11 @@ import java.awt.event.*;
 public class AdminPanel extends AdminDatabaseHandler {
     static DevSettings devSettings = new DevSettings();
     static Theme.Colors themeColors = new Theme.Colors();
-
+    static ChooseUsers chooseUsers = new ChooseUsers();
 
     public void showAdminPanel() {
         JFrame frame = new JFrame("Admin Panel");
-        frame.setSize(500, 650);
+        frame.setSize(500, 300);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         if (devSettings.getSetting("centered")) {
             frame.setLocationRelativeTo(null);
@@ -57,67 +57,32 @@ public class AdminPanel extends AdminDatabaseHandler {
                 main.showHomepage();
             }
         });
-    
-        frame.add(backButton, gbc); 
+
+        frame.add(backButton, gbc);
 
         gbc.gridy = 2;
         gbc.insets = new Insets(10, 0, 0, 0);
 
         JPanel menuPanel = new JPanel();
         menuPanel.setBackground(Color.decode(themeColors.getColor("subHeader")));
-        menuPanel.setPreferredSize(new Dimension(400, 400));
-        menuPanel.setLayout(new GridLayout(3, 2, 0, 0));  // 3 rows, 2 columns, 10px spacing
-
-        // Main Buttons
-        JButton addProduct = new JButton("Add Product");
-        addProduct.setBackground(Color.decode(themeColors.getColor("secondary")));
-        addProduct.setForeground(Color.decode(themeColors.getColor("text")));
-        addProduct.setBorder(BorderFactory.createLineBorder(Color.decode(themeColors.getColor("subHeader")), 10));
-        addProduct.setFont(new Font("Arial", Font.BOLD, 20));
-        menuPanel.add(addProduct);
+        menuPanel.setPreferredSize(new Dimension(450, 100));
+        menuPanel.setLayout(new GridLayout(1, 3, 20, 0));
 
         JButton viewProducts = new JButton("View Products");
-        viewProducts.setBackground(Color.decode(themeColors.getColor("secondary")));
-        viewProducts.setForeground(Color.decode(themeColors.getColor("text")));
-        viewProducts.setBorder(BorderFactory.createLineBorder(Color.decode(themeColors.getColor("subHeader")), 10));
-        viewProducts.setFont(new Font("Arial", Font.BOLD, 20));
-        menuPanel.add(viewProducts);
-
-        JButton viewOrders = new JButton("View Orders");
-        viewOrders.setBackground(Color.decode(themeColors.getColor("secondary")));
-        viewOrders.setForeground(Color.decode(themeColors.getColor("text")));
-        viewOrders.setBorder(BorderFactory.createLineBorder(Color.decode(themeColors.getColor("subHeader")), 10));
-        viewOrders.setFont(new Font("Arial", Font.BOLD, 20));
-        menuPanel.add(viewOrders);
-
         JButton viewUsers = new JButton("View Users");
-        viewUsers.setBackground(Color.decode(themeColors.getColor("secondary")));
-        viewUsers.setForeground(Color.decode(themeColors.getColor("text")));
-        viewUsers.setBorder(BorderFactory.createLineBorder(Color.decode(themeColors.getColor("subHeader")), 10));
-        viewUsers.setFont(new Font("Arial", Font.BOLD, 20));
-        menuPanel.add(viewUsers);
 
-        JButton addAdmin = new JButton("Add Admin");
-        addAdmin.setBackground(Color.decode(themeColors.getColor("secondary")));
-        addAdmin.setForeground(Color.decode(themeColors.getColor("text")));
-        addAdmin.setBorder(BorderFactory.createLineBorder(Color.decode(themeColors.getColor("subHeader")), 10));
-        addAdmin.setFont(new Font("Arial", Font.BOLD, 20));
-        menuPanel.add(addAdmin);
+        JButton[] buttons = { viewProducts, viewUsers };
+        for (JButton button : buttons) {
+            button.setBackground(Color.decode(themeColors.getColor("secondary")));
+            button.setForeground(Color.decode(themeColors.getColor("text")));
+            button.setBorder(BorderFactory.createLineBorder(Color.decode(themeColors.getColor("subHeader")), 10));
+            button.setFont(new Font("Arial", Font.BOLD, 14));
+            menuPanel.add(button);
+        }
 
-        JButton viewAdmins = new JButton("View Admins");
-        viewAdmins.setBackground(Color.decode(themeColors.getColor("secondary")));
-        viewAdmins.setForeground(Color.decode(themeColors.getColor("text")));
-        viewAdmins.setBorder(BorderFactory.createLineBorder(Color.decode(themeColors.getColor("subHeader")), 10));
-        viewAdmins.setFont(new Font("Arial", Font.BOLD, 20));
-        menuPanel.add(viewAdmins);
-
-        addProduct.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-                EditProduct editProduct = new EditProduct();
-                editProduct.showEditor(null, null, null);
-            }
-        }); 
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.insets = new Insets(10, 20, 10, 20);
 
         viewProducts.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -126,7 +91,14 @@ public class AdminPanel extends AdminDatabaseHandler {
                 homepage.showHomepage();
             }
         });
-        
+
+        viewUsers.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                chooseUsers.showChooseUser();
+            }
+        });
+
         frame.add(menuPanel, gbc);
 
     }

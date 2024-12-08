@@ -4,7 +4,7 @@ public class DevSettings {
     String appName = "Salamat Shapi";
 
     int width = 500;
-    int height = 650;
+    int height = 350;
 
     boolean isAlwaysOnTop = true;
     boolean isResizable = true;
@@ -15,17 +15,17 @@ public class DevSettings {
     public boolean getSetting(String setting) {
         switch (setting) {
             case "alwaysOnTop":
-            return isAlwaysOnTop;
+                return isAlwaysOnTop;
             case "resizable":
-            return isResizable;
+                return isResizable;
             case "visible":
-            return isVisible;
+                return isVisible;
             case "centered":
-            return isCentered;
+                return isCentered;
             case "isLoggedIn":
-            return isLoggedIn;
+                return isLoggedIn;
             default:
-            return false;
+                return false;
         }
     }
 

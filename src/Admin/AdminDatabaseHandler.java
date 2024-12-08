@@ -5,8 +5,35 @@ import java.sql.*;
 public class AdminDatabaseHandler {
 
     private static final String ADMIN_CREDENTIALS_DB = "jdbc:sqlite:src/Database/AdminCredentials.db";
-    private static final String USER_ORDERS_DB = "jdbc:sqlite:src/Database/UserOrders.db";
+    private static final String USER_ORDERS_DB = "jdbc:sqlite:src/Database/UsersOrders.db";
+    private static final String USERS_CREDENTIALS = "jdbc:sqlite:src/Database/UserCredentials.db";
     private static final String PRODUCTS_DB = "jdbc:sqlite:src/Database/Products.db";
+
+    public String[] getAdminUsernames() {
+        String[] usernames = null;
+        try {
+            Connection connection = DriverManager.getConnection(ADMIN_CREDENTIALS_DB);
+            Statement statement = connection.createStatement();
+            String getUsernames = "SELECT username FROM AdminCredentials";
+            ResultSet resultSet = statement.executeQuery(getUsernames);
+            int rowCount = 0;
+            while (resultSet.next()) {
+                rowCount++;
+            }
+            usernames = new String[rowCount];
+            resultSet = statement.executeQuery(getUsernames);
+            int i = 0;
+            while (resultSet.next()) {
+                usernames[i] = resultSet.getString("username");
+                i++;
+            }
+            statement.close();
+            connection.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return usernames;
+    }
 
     public void createDefaultAdmin() {
         try {
@@ -200,13 +227,86 @@ public class AdminDatabaseHandler {
         }
     }
 
-    public String[][] getUserOrders() {
+    public String[] getUsernames() {
+        String[] usernames = null;
+        try {
+            Connection connection = DriverManager.getConnection(USERS_CREDENTIALS);
+            Statement statement = connection.createStatement();
+            String getUsernames = "SELECT username FROM UserCredentials";
+            ResultSet resultSet = statement.executeQuery(getUsernames);
+            int rowCount = 0;
+            while (resultSet.next()) {
+                rowCount++;
+            }
+            usernames = new String[rowCount];
+            resultSet = statement.executeQuery(getUsernames);
+            int i = 0;
+            while (resultSet.next()) {
+                usernames[i] = resultSet.getString("username");
+                i++;
+            }
+            statement.close();
+            connection.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return usernames;
+    }
+
+    public String[][] getUserOrders(String username) {
         String[][] userOrders = null;
         try {
-            
+            Connection connection = DriverManager.getConnection(USER_ORDERS_DB);
+            Statement statement = connection.createStatement();
+            String createTable = "CREATE TABLE IF NOT EXISTS " + username + "orders (" +
+                    "orderID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "groupOrderID INTEGER, " +
+                    "itemName TEXT, " +
+                    "description TEXT, " +
+                    "price TEXT, " +
+                    "amount INTEGER, " +
+                    "status TEXT, " +
+                    "estimatedDeliveryDate TEXT)";
+            statement.execute(createTable);
+            String selectData = "SELECT * FROM " + username + "orders";
+            ResultSet resultSet = statement.executeQuery(selectData);
+            int rowCount = 0;
+            while (resultSet.next()) {
+                rowCount++;
+            }
+            userOrders = new String[rowCount][8];
+            resultSet = statement.executeQuery(selectData);
+            int i = 0;
+            while (resultSet.next()) {
+                userOrders[i][0] = resultSet.getString("orderID");
+                userOrders[i][1] = resultSet.getString("groupOrderID");
+                userOrders[i][2] = resultSet.getString("itemName");
+                userOrders[i][3] = resultSet.getString("description");
+                userOrders[i][4] = resultSet.getString("price");
+                userOrders[i][5] = resultSet.getString("amount");
+                userOrders[i][6] = resultSet.getString("status");
+                userOrders[i][7] = resultSet.getString("estimatedDeliveryDate");
+                i++;
+            }
+            statement.close();
+            connection.close();
         } catch (Exception e) {
             System.out.println(e);
         }
         return userOrders;
+    }
+
+    public void updateOrderStatus(String username, String orderId, String newStatus) {
+        try {
+            Connection connection = DriverManager.getConnection(USER_ORDERS_DB);
+            Statement statement = connection.createStatement();
+            String updateStatus = "UPDATE " + username + "orders SET status = '" + newStatus +
+                    "' WHERE orderID = " + orderId;
+            statement.execute(updateStatus);
+            statement.close();
+            connection.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 }

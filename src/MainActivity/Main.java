@@ -26,10 +26,10 @@ public class Main {
 
         // JButton tempButton = components.createButton("Login");
         // tempButton.addActionListener(new ActionListener() {
-        //     @Override
-        //     public void actionPerformed(ActionEvent e) {
-        //         System.out.println("Login button clicked");
-        //     }
+        // @Override
+        // public void actionPerformed(ActionEvent e) {
+        // System.out.println("Login button clicked");
+        // }
         // });
         // frame.add(tempButton);
 
@@ -100,7 +100,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        AdminDatabaseHandler  adminDatabaseHandler = new AdminDatabaseHandler();
+        AdminDatabaseHandler adminDatabaseHandler = new AdminDatabaseHandler();
         adminDatabaseHandler.addDefaultProducts();
         adminDatabaseHandler.createDefaultAdmin();
         Main main = new Main();

@@ -12,21 +12,62 @@ import java.util.ArrayList;
 
 public class ManageOrders {
     private String[][] orders;
+    private String username;
     private JPanel orderContainerPanel;
     private JScrollPane scrollPane;
 
     public ManageOrders(String username, String[][] orders) {
         this.orders = orders;
+        this.username = username;
     }
 
     static Theme.Colors themeColors = new Theme.Colors();
 
-    private JPanel createItemContainer(String orderId, String itemName, String description, double price, int quantity,
-            String status, String deliveryDate) {
+    private void updateOrderStatus(String[] order, String newStatus) {
+        AdminDatabaseHandler dbHandler = new AdminDatabaseHandler();
+        dbHandler.updateOrderStatus(username, order[0], newStatus);
+        // Refresh the orders data and display
+        orders = dbHandler.getUserOrders(username);
+        updateOrderDisplay("All");
+    }
+
+    private JPanel createStatusButtonsPanel(String[] order) {
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        buttonsPanel.setBackground(Color.decode(themeColors.getColor("primary")));
+
+        JButton toShipBtn = new JButton("To Ship");
+        JButton onWayBtn = new JButton("On The Way");
+        JButton receivedBtn = new JButton("Received");
+        JButton cancelBtn = new JButton("Cancelled");
+
+        JButton[] buttons = {toShipBtn, onWayBtn, receivedBtn, cancelBtn};
+        for (JButton btn : buttons) {
+            btn.setFont(new Font("Arial", Font.PLAIN, 10));
+            btn.setBackground(Color.decode(themeColors.getColor("secondary")));
+            btn.setForeground(Color.decode(themeColors.getColor("text")));
+            buttonsPanel.add(btn);
+        }
+
+        toShipBtn.addActionListener(e -> updateOrderStatus(order, "To Ship"));
+        onWayBtn.addActionListener(e -> updateOrderStatus(order, "On the way"));
+        receivedBtn.addActionListener(e -> updateOrderStatus(order, "Received"));
+        cancelBtn.addActionListener(e -> updateOrderStatus(order, "Cancelled"));
+
+        return buttonsPanel;
+    }
+
+    private JPanel createItemContainer(String[] order) {
+        String orderId = order[0];
+        String itemName = order[2];
+        String description = order[3];
+        double price = Double.parseDouble(order[4]);
+        int quantity = Integer.parseInt(order[5]);
+        String status = order[6];
+        String deliveryDate = order[7];
 
         JPanel itemContainer = new JPanel();
         itemContainer.setBackground(Color.decode(themeColors.getColor("primary")));
-        itemContainer.setPreferredSize(new Dimension(545, 90));
+        itemContainer.setPreferredSize(new Dimension(545, 120)); 
         itemContainer.setLayout(new BorderLayout());
         itemContainer.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -79,6 +120,10 @@ public class ManageOrders {
 
         itemContainer.add(rightPanel, BorderLayout.EAST);
 
+        // Add status buttons panel
+        JPanel statusButtonsPanel = createStatusButtonsPanel(order);
+        itemContainer.add(statusButtonsPanel, BorderLayout.SOUTH);
+
         return itemContainer;
     }
 
@@ -89,50 +134,43 @@ public class ManageOrders {
 
         Map<String, java.util.List<String[]>> groupedOrders = new HashMap<>();
         for (String[] order : orders) {
-            if (order.length < 8) continue;  // Skip invalid orders
-            String groupId = order[7];
+            if (order.length < 8) continue;
+            String groupId = order[1]; // Using groupOrderID instead of orderID
             groupedOrders.computeIfAbsent(groupId, k -> new ArrayList<>()).add(order);
         }
 
         for (java.util.List<String[]> orderGroup : groupedOrders.values()) {
             if (orderGroup.isEmpty()) continue;
             
-            String status = orderGroup.get(0)[5];
+            String status = orderGroup.get(0)[6]; // Status is at index 6
             if (!filter.equals("All") && !status.equals(filter)) continue;
 
-            // Create a container for each order group
             JPanel groupPanel = new JPanel();
             groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
             groupPanel.setBackground(Color.decode(themeColors.getColor("primary")));
 
-            // Add group header
-            JLabel groupLabel = new JLabel("Order #" + orderGroup.get(0)[7]);
+            JLabel groupLabel = new JLabel("Group Order #" + orderGroup.get(0)[1], SwingConstants.CENTER); // Using groupOrderID
             groupLabel.setFont(new Font("Arial", Font.BOLD, 14));
             groupLabel.setForeground(Color.decode(themeColors.getColor("text")));
+            groupLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             groupPanel.add(groupLabel);
 
-            // Calculate group total
             double groupTotal = 0.0;
 
-            // Add items
             for (String[] item : orderGroup) {
                 try {
-                    double price = Double.parseDouble(item[3]);
-                    int quantity = Integer.parseInt(item[4]);
-                    groupTotal += price * quantity;
-
-                    JPanel itemContainer = createItemContainer(
-                        item[0], item[1], item[2], 
-                        price, quantity, 
-                        item[5], item[6]
-                    );
+                    JPanel itemContainer = createItemContainer(item);
                     groupPanel.add(itemContainer);
+                    
+                    double price = Double.parseDouble(item[4]);
+                    int quantity = Integer.parseInt(item[5]);
+                    groupTotal += price * quantity;
                 } catch (NumberFormatException e) {
+                    System.out.println("Error parsing order data: " + e.getMessage());
                     continue;
                 }
             }
 
-            // Add group total
             JPanel totalPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             totalPanel.setBackground(Color.decode(themeColors.getColor("primary")));
             JLabel totalLabel = new JLabel(String.format("Order Total: ₱%.2f", groupTotal));
@@ -141,10 +179,10 @@ public class ManageOrders {
             totalPanel.add(totalLabel);
             groupPanel.add(totalPanel);
 
-            groupPanel.setBounds(2, yPosition, 545, orderGroup.size() * 115 + 50); // Increased height for total
+            groupPanel.setBounds(2, yPosition, 545, orderGroup.size() * 130 + 50); // Increased from 100 to 130
             orderContainerPanel.add(groupPanel);
 
-            yPosition += (orderGroup.size() * 115) + 60; // Increased spacing for total
+            yPosition += (orderGroup.size() * 130) + 60; // Increased from 100 to 130
             totalHeight = yPosition;
         }
 
@@ -153,7 +191,7 @@ public class ManageOrders {
         orderContainerPanel.repaint();
     }
 
-    public void showOrders() {
+    public void showUsersOrders() {
         DevSettings devSettings = new DevSettings();
         Theme.Colors themeColors = new Theme.Colors();
         JFrame frame = new JFrame("Orders");
@@ -223,6 +261,17 @@ public class ManageOrders {
         frame.add(headerPanel, gbc);
 
         gbc.gridy = 2;
+
+        gbc.anchor = GridBagConstraints.WEST;
+
+        JLabel usernameLabel = new JLabel("User: " + username);
+        usernameLabel.setFont(new Font("Arial", Font.BOLD, 15));
+        usernameLabel.setForeground(Color.decode(themeColors.getColor("text")));
+        frame.add(usernameLabel, gbc);
+        
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        gbc.gridy = 3;
 
         orderContainerPanel = new JPanel();
         orderContainerPanel.setBackground(Color.decode(themeColors.getColor("subHeader")));
