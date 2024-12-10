@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "MainActivity.Main",
+            "projectName": "salamatshapi_b05a174f"
+        },
+        {
+            "type": "java",
             "name": "testInterface",
             "request": "launch",
             "mainClass": "testInterface",
