@@ -147,6 +147,7 @@ public class Homepage extends UserFileHandler {
             EditProduct editProduct = new EditProduct();
             editButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    frame.dispose();
                     editProduct.showEditor(productName, price, description);
                 }
             });
@@ -170,10 +171,10 @@ public class Homepage extends UserFileHandler {
         return productContainer;
     }
 
+    JFrame frame = new JFrame("Homepage");
     public void showHomepage() {
         Colors themeColors = new Colors();
         DevSettings devSettings = new DevSettings();
-        JFrame frame = new JFrame("Homepage");
 
         if (!isAdmin) {
             getTotalCartItems();
@@ -239,6 +240,7 @@ public class Homepage extends UserFileHandler {
             addProductButton.setForeground(Color.decode(themeColors.getColor("text")));
             addProductButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    frame.dispose();
                     EditProduct editProduct = new EditProduct();
                     editProduct.showEditor(null, null, null);
                 }

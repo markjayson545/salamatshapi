@@ -86,7 +86,6 @@ public class AdminPanel extends AdminDatabaseHandler {
 
         viewProducts.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                frame.dispose();
                 Homepage homepage = new Homepage(null, true);
                 homepage.showHomepage();
             }
